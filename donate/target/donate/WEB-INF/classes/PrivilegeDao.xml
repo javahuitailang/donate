@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.donate.dao.PrivilegeDao">
+	<!-- 目的:为dao接口方法提供sql语句配置 -->
+	<resultMap id="privilegeMap" type="com.donate.po.Privilege">
+		<id property="id" column="privilege_id" javaType="java.lang.Integer" />
+		<result property="name" column="privilegeName" javaType="java.lang.String" />
+		<result property="path" column="privilegePath" javaType="java.lang.String" />
+		<result property="parentNode" column="parentNode" javaType="java.lang.Integer" />
+		<result property="rootNode" column="rootNode" javaType="java.lang.Integer" />
+		<result property="isRoot" column="isRoot" javaType="java.lang.Integer" />
+	</resultMap>
+
+
+	<!-- 查找总记录数 -->
+	<select id="getPrivilegesCount" resultType="Integer">
+		select count(*) from t_privilege
+	</select>
+
+	<!-- 根据名称模糊分页查询权限信息 -->
+	<select id="getPrivilegeByName" resultMap="privilegeMap">
+		select * from
+		t_privilege
+		where privilegeName like '%${privilegeName}%'
+		limit
+		#{pageCurrent},#{pageSize}
+	</select>
+
+	<!-- 根据名称获取Privilege信息总数量 -->
+	<select id="gettotalPrivilegeByName" resultType="int"
+		parameterType="string">
+		select count(*) from t_privilege
+		<where>
+			<if test="privilegeName != ''">
+				privilegeName like '%${privilegeName}%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据主键ID删除改行数据 -->
+	<delete id="deleteById" parameterType="int">
+		delete from t_privilege
+		where privilege_id = #{id}
+	</delete>
+
+	<!--批量删除 -->
+	<delete id="deleteByIds" parameterType="int">
+		delete from t_privilege
+		where privilege_id in
+		<foreach collection="array" open="(" close=")" separator=","
+			item="ids">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!--根据ID更新列信息 -->
+	<update id="updateById" parameterType="com.donate.po.Privilege">
+		update t_privilege
+		<set>
+			<if test="name !=null">
+				privilegeName = #{name},
+			</if>
+			<if test="path !=null">
+				privilegePath = #{path},
+			</if>
+			<if test="parentNode !=null">
+				parentNode = #{parentNode},
+			</if>
+			<if test="rootNode !=null">
+				rootNode = #{rootNode},
+			</if>
+			<if test="isRoot !=null">
+				isRoot = #{isRoot}
+			</if>
+		</set>
+		where privilege_id = #{id}
+	</update>
+
+	<!-- 添加Privilege -->
+	<insert id="addPrivilege" parameterType="com.donate.po.Privilege">
+		insert into
+		t_privilege(privilege_id,privilegeName,privilegePath,parentNode,rootNode,isRoot)
+		value(#{id},#{name},#{path},#{parentNode},#{rootNode},#{isRoot})
+	</insert>
+
+	<!--获取全部Privilege信息数据 -->
+	<select id="getAllPrivileges" resultMap="privilegeMap">
+		select * from t_privilege
+		<if test="queryPrivilegeName != ''">
+			where privilegeName like
+			concat('%',#{queryPrivilegeName},'%')
+		</if>
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	<select id="getAllPrivileges1" resultMap="privilegeMap">
+		select * from t_privilege 
+	</select>
+
+	<!--根据ID 查询到列信息，显示出来 -->
+	<select id="getPrivilegeById" parameterType="int" resultMap="privilegeMap">
+		select * from t_privilege where privilege_id = #{id}
+	</select>
+
+	<select id="getUserAllPrivilegeByUserId" parameterType="int" resultMap="privilegeMap">
+		select p.privilege_id,p.privilegeName,p.privilegePath,p.parentNode,p.rootNode,p.isRoot 
+		from t_privilege p, t_user_privilege up
+		where up.privilege_id=p.privilege_id and
+		up.user_id=#{id}
+	</select>
+
+</mapper>

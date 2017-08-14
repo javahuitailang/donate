@@ -1,0 +1,270 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+	font-size:12px;
+	margin:0px;
+	padding:0px;
+	
+}
+
+#banner{
+	margin:0px;
+	padding:0px;
+	height:60px;
+}
+#logo{
+	position:absolute;
+	margin:0px;
+	left:0px;
+	top:0px;
+}
+#homemenu {
+	margin:0px;
+	padding:0px;
+	float:left;
+}
+#homemenu div {
+	float:left;
+	width:120px;
+	height:75px;
+	margin:40px;
+}
+
+.top_menu{
+	background:url(../../images/menu.gif) repeat-x;
+	height:25px;
+	margin:0px;
+	padding:0px;
+	line-height:25px;
+}
+
+a:link,a:visited {
+	color: #336699;
+	text-decoration: none;
+}
+a:hover{
+	font-weight: 900;
+	color: #333333;
+	text-decoration: underline;
+}
+img {
+	border:none;
+}
+#unknow,#success,#error{
+	padding-top:80px;
+	text-align:center;
+}
+#unknow_top,#success_top,#error_top {
+	background:url(../../images/hr.gif) no-repeat;
+	background-position:center;
+	width:381px;
+	height:67px;	
+}
+#unknow_bottom {
+	background:url(../../images/unknow.gif) no-repeat;
+	background-position:center;
+	width:354px;
+	height:172px;
+	padding-top:80px;
+	color:#FF0000;
+}
+#success_bottom {
+	background:url(../../images/success.gif) no-repeat;
+	background-position:center;
+	width:354px;
+	height:172px;
+	padding-top:80px;
+	color:#FF0000;
+}
+#error_bottom {
+	background:url(../../images/error.gif) no-repeat;
+	background-position:center;
+	width:354px;
+	height:172px;
+	padding-top:80px;
+	color:#FF0000;
+}
+#tree {
+	margin:0px;
+	float:left;
+}
+/*＝＝＝＝＝＝*/
+div.title {
+	border:1px #ABABAB solid;
+	background:#F7F7F7;
+	margin:10px;
+	padding-left:5px;
+	height:25px;
+	line-height:25px;
+}
+div.filter {
+	margin:10px;
+	padding:5px;
+	height:25px;
+	line-height:25px;
+}
+/*详细页面*/
+
+
+/*详细页面*/
+form {
+	margin:0px;
+	padding:0px;
+}
+input.btn {
+	border:1px #2D2D2D solid;
+	background:#E9E9E9;
+	cursor:pointer;
+	height:20px;
+}
+div.list {
+	text-align:center;
+	margin:10px;
+}
+div.list table{
+	width:100%;
+	border-collapse:collapse;
+}
+div.list table td{
+	border:1px #ABABAB solid;
+	height:20px;
+}
+div.list table tr.title{
+	background:#F7F7F7;
+	text-align:center;
+	font-weight:bold;
+	color:#3399FF;
+}
+div.page {
+	text-align:center;
+	margin:10px;
+	padding-bottom:20px;
+}
+div.page .aa{
+	color:#339966;
+	text-decoration: none;
+}
+div.handle {
+	text-align:right;
+	padding-right:15px;
+	padding-top:5px;
+}
+/*＝＝＝＝＝＝*/
+
+/*==========*/
+div.main_input {
+	margin:10px;
+}
+div.main_input table{
+	width:100%;
+	border-collapse:collapse;
+}
+div.main_input table td{
+	border:1px #ABABAB solid;
+	height:20px;
+}
+.tdbg1{
+	background:#F7F7F7;
+	text-align:center;
+	
+}
+input.inp1{
+	width:80%;
+	border: 1px inset #CCCCCC;
+}
+input.inp2{
+	width:180px;
+	border: 1px inset #CCCCCC;
+}
+textarea.texta{
+	width:100%;
+	height:350px;
+	border: 1px inset #CCCCCC;
+}
+textarea.texta2{
+	width:100%;
+	height:40px;
+	border: 1px inset #CCCCCC;
+}
+img.picture {
+	width:expression(this.width > 90 ? 90 : this.width);
+}
+/*===========*/
+
+
+/*======== Authority =======*/
+.multiSelect_left {
+	width: 200px;
+	height: 300px;
+	font-size: 12px;
+	margin-top: 10px;
+}
+
+
+.multiSelect_right {
+	width: 200px;
+	height: 300px;
+	font-size: 12px;
+	margin-top: 10px;
+}
+
+select {
+	font-size: 12px;
+}
+
+.select1  {
+	width: 90%;
+	text-align: left;
+}
+
+.select2  {
+	text-align: left;
+	width: 100%;
+}
+
+.img_modify {
+	height: 18px;
+	width: 18px;
+	border: none;
+}
+
+
+.text{
+	width:90%;
+	border: 1px inset #CCCCCC;
+}
+
+.text_query {
+	width:100px;
+	border: 1px inset #CCCCCC;
+}
+
+.main_input span {
+	color: #FF0000;
+	font-size: 18px;
+	font-weight: bolder;
+	font-family: "华文细黑";
+}
+#layout_multiSelect{
+	margin:10px;
+	border:1px solid #ABABAB;
+	text-align:center;
+}
+
+#layout_multiSelect table {
+	width:40%;
+	border-collapse:collapse;
+	text-align:center;
+	margin-top:20px;
+	margin-bottom:20px;
+}
+
+#creator {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-left: 5px;
+	margin-right: 5px;
+	width: 200px;
+	float: right;
+	text-align: right;
+}

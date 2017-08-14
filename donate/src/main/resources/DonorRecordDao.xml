@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.donate.dao.DonorRecordDao">
+	<resultMap type="com.donate.po.DonorRecord" id="DonorRecordMap">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="donorDate" property="donorDate" jdbcType="DATE" />
+		<result column="donorMoney" property="donorMoney" jdbcType="DOUBLE" />
+		<result column="donorState" property="donorState" jdbcType="INTEGER" />
+		<result column="comments" property="comments" jdbcType="VARCHAR" />
+		<result column="recordState" property="recordState" jdbcType="INTEGER" />
+		<!-- 一对一关联 -->
+		<association property="donor" column="donor" select="com.donate.dao.UserDao.getUserById"></association>
+		<association property="appeal" column="appeal" select="com.donate.dao.AppealDao.getAppealById"></association>
+	</resultMap>
+	<!-- //根据捐款记录查询 -->
+	<select id="getDonorRecordById" parameterType="INTEGER" resultMap="DonorRecordMap">
+		select * from t_donorrecord where id =#{id} and donorState = 1
+	</select>
+	<!-- //查询所有//资金去向 where u.id = d.donor -->
+	<select id="getAll" resultMap="DonorRecordMap">
+		select * from t_donorrecord where donorState = 1 order by donorDate desc limit #{pageCurrent},#{pageSize} 
+	</select>
+	<!-- //按日期最新查询部分(降序) -->
+	<select id="getDonorRecords" resultMap="DonorRecordMap">
+		select * from t_donorrecord where donorState = 1 order by donorDate desc limit #{pageCurrent},#{pageSize} 
+	</select>
+	
+	<!--//个人捐款最新排行 -->
+	<select id="getAllDonateRanking" resultType="com.donate.po.DonateInfo" >
+		select  u.id,u.realName,u.sex,cc.totalMoney,tt.donorDate 
+		from 
+		
+		(select sum(donorMoney) as totalMoney,donor from t_donorrecord where donorState = 1 group by donor) cc,
+		
+		t_user u,
+		
+		(SELECT * FROM (SELECT d.donorDate,d.donor FROM (SELECT donor FROM t_donorrecord WHERE donorState = 1 GROUP BY donor) ss,t_donorrecord d
+		WHERE d.donorState = 1 AND d.donor=ss.donor GROUP BY donor ORDER BY donorDate DESC) mm GROUP BY donor) tt
+		
+		where cc.donor = tt.donor and cc.donor = u.id  
+		order by cc.totalMoney desc 
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	<!-- 捐款人数 -->
+	<select id="getTotalUsers" resultType="Integer" parameterType="Integer">
+		SELECT COUNT(donor) FROM (SELECT donor FROM t_donorrecord where donorState = 1 GROUP BY donor) aa;
+	</select>
+	
+	<!-- //会员的捐款记录查询 -->
+	<select id="getAllById" resultMap="DonorRecordMap">
+		select * from t_donorrecord
+		where donor = #{userId} and donorState = 1
+		 order by donorDate desc 
+		 limit #{pageCurrent},#{pageSize}
+	</select>
+	<!-- //项目的收款记录查询 -->
+	<select id="getAppealById" resultMap="DonorRecordMap">
+		select * from t_donorrecord
+		where appeal = #{appealId} and donorState = 1
+		 order by donorDate desc
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	<!-- //插入捐款信息 -->
+	<insert id="insertDonorRecord" parameterType="DonorRecord">
+		insert into
+		t_donorrecord
+		(orderNumber,donor,appeal,donorDate,donorMoney,donorState,comments)
+		values
+		(#{orderNumber},#{donor.id},#{appeal.id},#{donorDate},#{donorMoney},#{donorState},#{comments})
+	</insert>
+	<!-- //获得全站的捐款数额 -->
+	<select id="getTotalDonorMoney" resultType="DOUBLE">
+		SELECT SUM(donorMoney) FROM t_donorrecord where donorState = 1
+	</select>
+	<!-- //会员的捐款总数 -->
+	<select id="getDonorMoneyById" resultType="DOUBLE">
+		SELECT SUM(donorMoney) FROM t_donorrecord where donor = #{donor.id} and donorState = 1
+	</select>
+	<!-- 收到的捐款总数 -->
+	<select id="getAppealMoneyById" resultType="DOUBLE">
+		SELECT SUM(donorMoney) FROM t_donorrecord where appeal = #{appeal.id} and donorState = 1
+	</select>
+	<!-- 获得全站的捐款总记录数 -->
+	<select id="getTotal" resultType="Integer">
+		select count(id) from t_donorrecord where donorState = 1
+	</select>
+	<!-- 会员的捐款的总记录数 -->
+	<select id="getTotalById" resultType="Integer">
+		select count(id) from t_donorrecord where donor = #{donor.id} and donorState = 1
+	</select>
+		<!-- 会员的收款的总记录数 -->
+	<select id="getTotalAppealById" resultType="Integer">
+		select count(id) from t_donorrecord where appeal = #{appeal.id} and donorState = 1
+	</select>
+	<!-- 捐款对象查询 -->
+	<select id="search1" resultMap="DonorRecordMap">
+		select * from t_donorrecord where donorState = 1 and donor in ( select u.id from t_user u where u.realName like  
+		concat('%',#{context},'%'))   order by donorDate desc  limit #{pageCurrent},#{pageSize}
+	</select>
+	<!-- 捐款项目 -->
+	<select id="search2" resultMap="DonorRecordMap">
+		select * from t_donorrecord where donorState = 1 and appeal in ( select a.id from t_appeal a where a.title like  concat('%',#{context},'%' ))
+		 order by donorDate desc limit #{pageCurrent},#{pageSize}
+	</select>
+	<!-- //捐款对象查询总数 -->
+	<select id="searchCount1" resultType="int"  parameterType="string">
+		select count(d.id) from t_donorrecord d where donorState = 1 and d.donor in (select u.id from t_user u where u.realName like concat('%',#{context},'%')) 
+	</select>
+	<!-- //捐款项目总数 -->
+	<select id="searchCount2" resultType="Integer" parameterType="String">
+		select count(id) from t_donorrecord where donorState = 1 and appeal in (select a.id from t_appeal a where a.title like concat('%',#{context},'%'))
+	</select>
+	<!-- //根据时间和关键字查询 -->
+	<select id="getBackdonateList1" resultMap="DonorRecordMap">
+		select * from t_donorrecord where donorState = 1 and donor in ( select u.id from t_user u where u.realName like  
+		concat('%',#{context},'%') and donorDate between #{beforDate} and #{afterDate} ) 
+		 order by donorDate desc limit #{pageCurrent},#{pageSize}
+	</select>
+	<!-- //根据时间和关键字查询 -->
+	<select id="getBackdonateList2" resultMap="DonorRecordMap">
+		select * from t_donorrecord where donorState = 1 and appeal in ( select a.id from t_appeal a where a.title like  concat('%',#{context},'%' )
+		 and donorDate between #{beforDate} and #{afterDate} ) 
+		 order by donorDate desc limit #{pageCurrent},#{pageSize}
+	</select>
+		<!-- //根据时间和关键字查询总数 -->
+	<select id="getBackdonateListCount1" resultType="int"  parameterType="string">
+		select count(d.id) from t_donorrecord d where d.donorState = 1 and d.donor in (select u.id from t_user u where u.realName like concat('%',#{context},'%') 
+		and donorDate between #{beforDate} and #{afterDate} ) 
+	</select>
+	<!-- //根据时间和关键字查询总数 -->
+	<select id="getBackdonateListCount2" resultType="Integer" parameterType="String">
+		select count(id) from t_donorrecord where  donorState = 1 and appeal in (select a.id from t_appeal a where a.title like concat('%',#{context},'%') 
+		and donorDate between #{beforDate} and #{afterDate} ) 
+	</select>
+	<update id="updateDonorRecord" parameterType="DonorRecord">
+		UPDATE t_donorrecord SET donorState = 1,comments = #{comments} WHERE orderNumber = #{orderNumber}
+	</update>
+</mapper>

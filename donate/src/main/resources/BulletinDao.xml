@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.donate.dao.BulletinDao">
+    <!-- 目的:为dao接口方法提供sql语句配置 -->
+	<resultMap type="com.donate.po.Bulletin" id="bulletinMap">
+		<id property="Id" column="id" javaType="java.lang.Integer"/>
+		<result property="Title" column="title" javaType="java.lang.String"/>
+		<result property="content" column="content" javaType="java.lang.String"/>
+		<result property="State" column="state" javaType="java.lang.Integer"/>
+		<result property="createDate" column="createDate" javaType="java.util.Date"/>
+				<!-- 一对一关联 -->
+		<association property="createUser" column="createUser" select="com.donate.dao.UserDao.getUserById"></association>
+	</resultMap>
+
+	<select id="getABulletinById" resultType="Bulletin" parameterType="INTEGER">
+		select * from t_bulletin where id=#{Id}
+	</select>
+	
+	<!-- 获取最新公告 -->
+	<select id="getBulletins" resultMap="bulletinMap">
+		SELECT * FROM t_bulletin WHERE createDate=(SELECT MAX(createDate) FROM t_bulletin where state=0);
+	</select>
+ 
+	<!-- 按公告id检索 -->
+	<select id="getBulletinById" resultMap="bulletinMap">
+		select * from t_bulletin where id=#{Id} limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	<!-- 按公告标题检索 -->
+	<select id="getBulletinByTitle" resultMap="bulletinMap">
+		select * from t_bulletin where title like '%${Title}%' limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	<!-- 当用标题进行模糊查询时获取符合条件的公告条数 -->
+	<select id="getSearchTotal" resultType="INTEGER">
+		select count(*) from t_bulletin where title like '%${Title}%'
+	</select>
+	
+	<!-- 获取所有公告条数 -->
+	<select id="getTotal" resultType="INTEGER">
+		select count(*) from t_bulletin
+	</select>
+
+	<select id="getAllBulletins" resultMap="bulletinMap">
+		select * from t_bulletin order by createDate desc limit #{pageCurrent},#{pageSize} 
+	</select>
+	
+	<!-- 添加公告-->
+	<insert id="addBulletin" parameterType="Bulletin">
+		insert into t_bulletin(title,content,state,createUser,createDate) values(#{Title},#{content},#{State},#{createUser.id},#{createDate})
+	</insert>
+	
+	<!-- 删除公告-->
+	<delete id="deleteBulletinById">
+		delete from t_bulletin where id=#{id}
+	</delete>
+	<!-- 修改公告-->
+	<update id="updateBulletinById" parameterType="Bulletin">
+		update t_bulletin
+		<set>
+			<if test="Title != null">
+				title = #{Title},
+			</if>
+			<if test="content != null">
+				content = #{content},
+			</if>
+			<if test="State != null">
+				state = #{State},
+			</if>
+			<if test="createUser.id != null">
+				createUser = #{createUser.id},
+			</if>
+			<if test="createDate != null">
+				createDate = #{createDate}
+			</if>
+		</set>
+		where id = #{Id}
+	</update> 
+	
+	<!-- 根据id批量删除公告 -->
+	<delete id="deleteBatchById" parameterType="java.util.List">
+		delete from t_bulletin where 1=1 and id in
+		<foreach collection="list" open="(" close=")" item="item" separator="," >
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

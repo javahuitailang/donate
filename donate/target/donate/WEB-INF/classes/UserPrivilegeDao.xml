@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.donate.dao.UserPrivilegeDao">
+	<!-- 目的:为dao接口方法提供sql语句配置 -->
+	<select id="getUserPrivilegeById" resultType="UserPrivilege"
+		parameterType="INTEGER">
+		select * from t_user_privilege where id = #{id}
+	</select>
+
+	<insert id="save">
+		insert IGNORE  into
+		t_user_privilege(user_id,privilege_id)
+		value(#{user_id},#{privilege_id})
+	</insert>
+
+	<delete id="delete">
+		delete from t_user_privilege
+		where privilege_id = #{privilege_id} and user_id=#{user_id}
+	</delete>
+
+</mapper>

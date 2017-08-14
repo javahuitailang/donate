@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.donate.dao.UserDao">
+	<resultMap id="userMap" type="com.donate.po.User">
+        <id property="id" column="id" javaType="java.lang.Integer"/>
+		<result property="userName" column="userName" javaType="java.lang.String"/>
+		<result property="password" column="password" javaType="java.lang.String"/>
+		<result property="photo" column="photo" javaType="java.lang.String"/>
+		<result property="realName" column="realName" javaType="java.lang.String"/>
+		<result property="sex" column="sex" javaType="java.lang.Integer"/>
+		<result property="idCard" column="IDCard" javaType="java.lang.String"/>
+		<result property="tel" column="tel" javaType="java.lang.String"/>
+		<result property="email" column="email" javaType="java.lang.String"/>
+		<result property="address" column="address" javaType="java.lang.String"/>
+		<result property="code" column="code" javaType="java.lang.String"/>
+		<result property="effectDate" column="effectDate" javaType="java.util.Date"/>
+		<result property="countState" column="countState" javaType="java.lang.Integer"/>
+		<result property="countType" column="countType" javaType="java.lang.Integer"/>
+		<result property="createDate" column="createDate" javaType="java.util.Date"/>
+    </resultMap>
+    <!-- 根据姓名获取用户信息 -->
+    <select id="getPassWordByName" parameterType="string" resultType="java.lang.String">
+    	select  password from t_user where userName=#{userName} 
+    </select>
+    
+    <!-- 根据id修改用户成为管理员 -->
+    <update id="userToAdmin">
+    	update t_user set countType = 1 where id=#{id}
+    </update>
+    
+	<!-- 目的:为dao接口方法提供sql语句配置 -->
+	<select id="getUserById" resultType="User" parameterType="INTEGER">
+		select * from t_user where id = #{id}
+	</select>
+	
+	<select id="getUserByName" parameterType="string" resultMap="userMap">
+		select * from t_user where userName=#{userName};
+	</select>
+	
+	<insert id="addUser" parameterType="User">
+		insert into t_user (userName,password,sex,email,code,countState,countType,effectDate,createDate) values(#{userName},#{password},#{sex},#{email},#{code},#{countState},#{countType},#{effectDate},#{createDate});
+	</insert>
+	
+	<update id="updateUserByName" parameterType="User">
+		update t_user 
+	<set>
+		<if test = "password !=null">
+		password = #{password},
+		</if>
+		<if test="photo !=null">
+			photo = #{photo},
+		</if>
+		<if test="userName !=null">
+			userName = #{userName},
+		</if>
+		<if test="email !=null">
+			email = #{email},
+		</if>
+		<if test="tel !=null">
+			tel = #{tel},
+		</if>
+		<if test="realName !=null">
+			realName = #{realName},
+		</if>
+		<if test="idCard !=null">
+			IDCard = #{idCard},
+		</if>
+		<if test="address !=null">
+			address = #{address},
+		</if>
+		<if test="sex !=null">
+			sex = #{sex}
+		</if>
+	</set>
+		where userName = #{userName}	
+	</update>
+	<!-- <update id="updateCountStateByName" parameterType="string">
+		update t_user set countState = 1 where userName = #{userName} 
+	</update> -->
+	<update id="updateEffectDateAndCountStateByUser" parameterType="User">
+		update t_user set countState = 1 ,effectDate = #{effectDate} where userName = #{userName} 
+	</update>
+	<!-- <select id="getCountStateByName" parameterType="string" resultType="java.lang.Integer">
+		select countState from t_user where userName = #{userName}
+	</select> -->
+	
+	<select id="getTotalRecord" resultType="int">
+		select count(id) from t_user where countType=#{countType}
+		<if test="queryUserName != ''">
+			and userName like concat('%',#{queryUserName},'%')
+		</if>
+	</select>
+	
+	<select id="getAllUser" resultMap="userMap">
+		select * from t_user where countType=0
+		<if test="queryUserName != ''">
+			and userName like concat('%',#{queryUserName},'%') 
+		</if>
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	<!--显示所有管理员信息 -->
+	<select id="getAllManage" resultMap="userMap">
+		select * from t_user
+		<where>
+			countType=1
+			<if test="queryUserName != ''">
+				and userName like concat('%',#{queryUserName},'%')
+			</if>
+		</where>
+		
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	
+	<delete id="deleteByIds" parameterType="int">
+		delete from t_user 
+		where id in
+		<foreach collection="array" open="(" close=")" separator="," item="ids">
+			#{ids}
+		</foreach>
+	</delete>
+	
+	<!--根据主键删除管理员 -->
+	<delete id="deleteById" parameterType="int">
+		delete from t_user where id = #{id}
+	</delete>
+	
+	
+	<update id="updateCountStateById" parameterType="int">
+		update t_user set countState = 2
+		where id = #{id}
+	</update>
+	
+	<select id="findUserById" parameterType="int" resultMap="userMap">
+		select * from t_user
+		where id = #{id}
+	</select>
+</mapper>

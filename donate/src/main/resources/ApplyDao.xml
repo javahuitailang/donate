@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.donate.dao.ApplyDao"> 
+	<resultMap type="com.donate.po.Appeal" id="appealMap">
+		<id property="id" column="id" javaType="java.lang.Integer"/>
+		<id property="title" column="title" javaType="java.lang.String"/>
+		<id property="content" column="content" javaType="java.lang.String"/>
+		<id property="appealType" column="appealType" javaType="java.lang.Integer"/>
+		<id property="sortNum" column="sortNum" javaType="java.lang.Integer"/>
+		<id property="goalMoney" column="goalMoney" javaType="java.lang.Double"/>
+		<id property="holdMoney" column="holdMoney" javaType="java.lang.Double"/>
+		<id property="createDate" column="createDate" javaType="java.util.Date"/>
+		<id property="updateDate" column="updateDate" javaType="java.util.Date"/>
+		<id property="appealState" column="appealState" javaType="java.lang.Integer"/>
+		<association property="recipient" column="recipient" select="com.donate.dao.UserDao.getUserById"></association>
+		<association property="updateUser" column="updateUser" select="com.donate.dao.UserDao.getUserById"></association>
+	
+	</resultMap>
+<!-- 	查询总记录数 -->
+	<select id="getApplyCount" resultType="Integer">
+		select count(*) from t_appeal where appealType = 0 and appealState in(0,2,3)
+
+	</select>
+<!-- 	管理员查询所有申请 -->
+	<select id="getAllApplys" resultMap="appealMap">
+		select * from t_appeal where appealType = 0 and appealState in( 0,2,3) limit #{pageCurrent},#{pageSize}
+	</select>
+	
+<!-- 	根据id查询申请记录 -->
+	<select id="getApplyById" resultMap="appealMap">
+		select * from t_appeal where appealType = 0 and id = #{id}
+	</select>
+	
+<!-- 	管理员通过申请 -->
+	<update id="adoptApplyById">
+		update t_appeal set appealState = 1 where id = #{id}
+	</update>
+	
+<!-- 	管理员根据拒绝申请(根据id) -->
+	<update id="refuseApplyById">
+		update t_appeal set appealState = 2 where id = #{id}
+	</update>
+	
+<!-- 	管理员根据起止时间或者标题查询申请记录 -->
+	<select id="getApplysByTimeOrTitle" resultMap="appealMap" >
+		select * from t_appeal 
+			<if test="title != '' ">
+				where title like '%${title}%'
+			</if>
+			<if test="title == ''">
+				where
+			</if>
+			<if test="title != ''">
+				and
+			</if>
+			<if test="startTime !='' and endTime != ''">
+				applyDate &gt;= #{startTime} and applyDate &lt;= #{endTime}
+			</if>
+			limit #{pageCurrent},#{pageSize}
+	</select>
+	
+<!-- 	管理员根据编辑后同意申请 -->
+	<update id="editThenAdoptApply">
+		update t_appeal set appealState = 1, title = #{title}, content= #{content}, goalMoney = #{goalMoney} where id = #{id} 
+	</update>
+	
+</mapper>

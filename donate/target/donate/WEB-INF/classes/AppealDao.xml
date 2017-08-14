@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.donate.dao.AppealDao"> 
+	<resultMap type="com.donate.po.Appeal" id="appealMap">
+		<id property="id" column="id" javaType="java.lang.Integer"/>
+		<id property="title" column="title" javaType="java.lang.String"/>
+		<id property="content" column="content" javaType="java.lang.String"/>
+		<id property="appealType" column="appealType" javaType="java.lang.Integer"/>
+		<id property="sortNum" column="sortNum" javaType="java.lang.Integer"/>
+		<id property="goalMoney" column="goalMoney" javaType="java.lang.Double"/>
+		<id property="holdMoney" column="holdMoney" javaType="java.lang.Double"/>
+		<id property="createDate" column="createDate" javaType="java.util.Date"/>
+		<id property="updateDate" column="updateDate" javaType="java.util.Date"/>
+		<id property="appealState" column="appealState" javaType="java.lang.Integer"/>
+		<association property="recipient" column="recipient" select="com.donate.dao.UserDao.getUserById"></association>
+		<association property="updateUser" column="updateUser" select="com.donate.dao.UserDao.getUserById"></association>
+	
+	</resultMap>
+ 
+
+	<!-- 目的:为dao接口方法提供sql语句配置 -->
+
+	<select id="getAppealById" resultMap="appealMap" parameterType="Integer">
+
+		select * from t_appeal where id = #{id}
+	</select>
+	
+	<!-- 根据求助类型获得该类型的求助总记录数 -->
+	<select id="getTotalByAppealType" resultType="Integer" parameterType="Integer">
+		select count(*) from t_appeal where appealType = #{appealType} and appealState in (1,3)
+	</select>
+	
+	<!-- 根据用户id查询该用户求助总记录数 -->
+	<select id="getTotalByUserId" resultType="Integer" parameterType="Integer">
+		select count(*) from t_appeal where recipient = #{userId} and appealState = 1
+	</select>
+	
+	<!-- 根据id获取某个求助类型-->
+	<select id="getAppealType" resultType="Integer" parameterType="Integer">
+		select appealType from t_appeal where id = #{id} and appealState = 1
+	</select>
+	
+	<!-- 根据求助类型获取求助信息(公益还是个人) -->
+	<select id="getAllAppeals" resultMap="appealMap">
+		select * from t_appeal 
+		where appealType = #{appealType} and appealState in (1,3)  order by appealState 
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	<!-- //根据sortNum排序值降序获取前公益/个人求助信息四条数据
+	List<Appeal> getAppealsBySortNum(int appealType,int sortNum); -->
+	<select id="getGyAppealsBySortNum" resultMap="appealMap" parameterType="Integer">
+		select * from t_appeal 
+		where appealType = 1 and appealState = 1
+		order by sortNum desc 
+		limit 0,4 
+	</select>
+	
+		<!-- //根据sortNum排序值降序获取个人求助信息八条数据
+	List<Appeal> getAppealsBySortNum(int appealType,int sortNum); -->
+	<select id="getPerAppealsBySortNum" resultMap="appealMap" parameterType="Integer">
+		select * from t_appeal 
+		where appealType = 0 and appealState = 1
+		order by sortNum desc 
+		limit 0,8
+	</select>
+	
+	<!-- 根据sortNum排序值降序获取前两条数据作为头条 -->
+	<select id="getAppealHeaderBySortNum" resultMap="appealMap">
+		select * from t_appeal 
+		where appealState = 1
+		order by sortNum desc 
+		limit 0,2 
+	</select>
+		
+	<!--根据用户id获取该用户所有求助信息 -->
+	<select id="getAppealsByUserId" resultMap="appealMap">
+		select * from t_appeal 
+		where recipient = #{userId} and appealState = 1 
+		limit #{pageCurrent},#{pageSize}
+	</select>
+
+		<!-- //根据申请单id 更改已获得捐款和更新时间 -->
+	<update id="updateGoalMoneyById">
+		update t_appeal set goalMoney = goalMoney + #{goalMoney} , updateDate = #{updateDate} where id = #{appealId}
+	</update>
+	
+	<select id="getAppealList" resultMap="appealMap" >
+		SELECT * 
+		FROM t_appeal 
+		where title LIKE concat('%',#{title},'%') and appealState in (1,3)  order by appealState 
+		LIMIT #{pageCurrent},#{pageSize}
+	</select>
+	
+	<select id="getTotalAppealList" resultType="Integer" parameterType="String">
+		select count(*) from t_appeal where title LIKE concat('%',#{title},'%') and appealState in (1,3)
+	</select>
+
+	
+	
+	
+<!-- 	管理员根据起止时间查询个人求助信息
+	<select id="getAppealsByTimes" resultMap="appealMap">
+		select * from t_appeal
+		where appealType = #{appealType} and
+		createDate &gt;= #{startTime} and createDate &lt;= #{endTime}
+		limit #{pageCurrent},#{pageSize}
+	</select>
+	
+	
+	管理员根据标题名称模糊查询个人求助信息
+	<select id="getAppealsByName" resultMap="appealMap">
+		select * from t_appeal 
+		where appealType = #{appealType} and
+		title like '%${title}%'
+		limit #{pageCurrent},#{pageSize}
+	</select> -->
+	
+<!-- 	管理员根据时间标题查询个人求助信息/公益项目 -->
+	<select id="getAppealsByTime" resultMap="appealMap">
+		select * from t_appeal where appealType=#{appealType}
+		
+			<if test="title != ''">
+				and title like '%${title}%'
+			</if>
+			
+			<if test="startTime != '' and endTime != ''">
+				and createDate &gt;= #{startTime} and createDate &lt;= #{endTime}
+			</if>
+			
+			limit #{pageCurrent},#{pageSize}
+				
+	</select>
+	
+<!-- 	管理员根据id将个人求助信息下架 -->
+	<update id="invalidAppealById">
+		update t_appeal set appealState = 2 where id = #{id}
+	</update>
+	
+<!-- 	管理员根据id删除个人求助信息 -->
+	<delete id="deleteAppealById">
+		delete from t_appeal where id = #{id}
+	</delete>
+<!-- 	管理员根据id下架公益项目 	这里与个人下架个人求助信息重合，可以不用写，直接调用下架个人即可-->
+	<update id="invalidProjectAppealById">
+		update t_appeal set appealState = 1 where id = #{id}
+	</update>
+	
+
+	
+	<!-- 后台捐款统计 -->
+	<select id="getBackAll" resultMap="appealMap" >
+		select * from t_appeal LIMIT #{pageCurrent},#{pageSize}
+	</select>
+	<select id="getBackTotal" resultType="Integer" >
+		select count(id) from t_appeal
+	</select>
+	<select id="getBackAppealList1" resultMap="appealMap" >
+		SELECT * 
+		FROM t_appeal a, t_user u 
+		WHERE u.id=a.recipient 
+		AND u.realName LIKE concat('%',#{context},'%') 
+		AND a.createDate BETWEEN #{beforDate} AND #{afterDate} 
+		ORDER BY a.createDate 
+		LIMIT #{pageCurrent},#{pageSize}
+	</select>
+	<select id="getBackAppealList2" resultMap="appealMap" >
+		SELECT * 
+		FROM t_appeal a, t_user u 
+		WHERE u.id=a.recipient 
+		AND a.title LIKE concat('%',#{context},'%') 
+		AND a.createDate BETWEEN #{beforDate} AND #{afterDate} 
+		ORDER BY a.createDate 
+		LIMIT #{pageCurrent},#{pageSize}
+	</select>
+	<select id="getBackAppealListTotal1" resultType="Integer" >
+			SELECT count(a.id) 
+			FROM t_appeal a, t_user u 
+			WHERE u.id=a.recipient 
+			AND u.realName LIKE concat('%',#{context},'%') 
+			AND a.createDate BETWEEN #{beforDate} AND #{afterDate} 
+	</select>
+	<select id="getBackAppealListTotal2" resultType="Integer" >
+		SELECT count(a.id)  
+		FROM t_appeal a, t_user u 
+		WHERE u.id=a.recipient 
+		AND a.title LIKE concat('%',#{context},'%') 
+		AND a.createDate BETWEEN #{beforDate} AND #{afterDate} 
+	</select>
+	
+	<insert id="addAppeal" parameterType="com.donate.po.Appeal">
+		insert into t_appeal(title,
+							content,
+							appealType,
+							sortNum,
+							recipient,
+							goalMoney,
+							holdMoney,
+							createDate,
+							updateDate,
+							appealState,
+							updateUser) 
+						values(
+							   #{title},
+							   #{content},
+							   #{appealType},
+							   #{sortNum},
+							   #{recipient.id},
+							   #{goalMoney},
+							   #{holdMoney},
+							   #{createDate},
+							   #{updateDate},
+							   #{appealState},
+							   #{updateUser.id}
+							   )
+	</insert>
+	
+
+<!-- 	获得公益项目总记录数 -->
+	<select id="getProgramCount" resultType="Integer" parameterType="Integer">
+		select count(*) from t_appeal where appealType = #{appealType}
+	</select>
+	
+<!-- 	获得所有公益项目 -->
+<select id="getAllPrograms" resultMap="appealMap">
+	select * from t_appeal 
+		where appealType = #{appealType} 
+		limit #{pageCurrent},#{pageSize}
+</select>
+
+<!--  	管理员更新公益项目 -->
+<update id="updateProject" parameterType="com.donate.po.Appeal">
+	update t_appeal set title = #{title},
+							content = #{content},
+							appealType = #{appealType},
+							sortNum = #{sortNum},
+							recipient = #{recipient.id},
+							goalMoney = #{goalMoney},
+							holdMoney = #{holdMoney},
+							createDate = #{createDate},
+							updateDate = #{updateDate},
+							appealState = #{appealState},
+							updateUser = #{updateUser.id}
+							where id = #{id}
+</update>
+
+	
+
+	<select id="checkSupport"  resultType="int">
+		select count(id) from t_appeal where id = #{appealId} and appealState = 1
+	</select>
+
+</mapper>

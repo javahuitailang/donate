@@ -1,0 +1,12 @@
+[INFO] [2017-02-07 22:20:55][org.springframework.context.support.ClassPathXmlApplicationContext]Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4055010f: startup date [Tue Feb 07 22:20:55 CST 2017]; root of context hierarchy
+[INFO] [2017-02-07 22:20:55][org.springframework.beans.factory.xml.XmlBeanDefinitionReader]Loading XML bean definitions from class path resource [spring-mybatis.xml]
+[INFO] [2017-02-07 22:20:56][org.springframework.context.support.PropertySourcesPlaceholderConfigurer]Loading properties file from URL [file:/E:/workspace/donate/target/classes/jdbc.properties]
+[INFO] [2017-02-07 22:20:56][org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor]JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+[INFO] [2017-02-07 22:23:36][org.springframework.context.support.ClassPathXmlApplicationContext]Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@cb8a0c8: startup date [Tue Feb 07 22:23:36 CST 2017]; root of context hierarchy
+[INFO] [2017-02-07 22:23:36][org.springframework.beans.factory.xml.XmlBeanDefinitionReader]Loading XML bean definitions from class path resource [spring-mybatis.xml]
+[INFO] [2017-02-07 22:23:36][org.springframework.context.support.PropertySourcesPlaceholderConfigurer]Loading properties file from URL [file:/E:/workspace/donate/target/classes/jdbc.properties]
+[INFO] [2017-02-07 22:23:36][org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor]JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+[INFO] [2017-02-07 22:27:29][org.springframework.context.support.ClassPathXmlApplicationContext]Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@6e156bbf: startup date [Tue Feb 07 22:27:29 CST 2017]; root of context hierarchy
+[INFO] [2017-02-07 22:27:29][org.springframework.beans.factory.xml.XmlBeanDefinitionReader]Loading XML bean definitions from class path resource [spring-mybatis.xml]
+[INFO] [2017-02-07 22:27:30][org.springframework.context.support.PropertySourcesPlaceholderConfigurer]Loading properties file from URL [file:/E:/workspace/donate/target/classes/jdbc.properties]
+[INFO] [2017-02-07 22:27:30][org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor]JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
